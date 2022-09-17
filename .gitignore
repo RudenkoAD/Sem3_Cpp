@@ -1,0 +1,7 @@
+.vscode
+Debug
+src
+.cproject
+.project
+*.exe
+*.o
