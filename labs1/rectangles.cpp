@@ -77,7 +77,7 @@ Rectangle solve(Rectangle last){
         }
         else if( a=="+"){
             std::cout<<"i've read +\n";
-            next = solve();
+            next = solve(last);
             last = last+next;
             return last;
         }
