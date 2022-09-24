@@ -124,6 +124,15 @@ class Fraction {
         }
 };
 
+std::ostream& operator<<(std::ostream& out, const Fraction& obj){  // Оператор вывода << "числитель знаминатель"
+    out<<obj.numerator<<obj.denominator;
+    return out;
+}
+std::istream& operator>>(std::istream& is, Fraction& obj){  // Оператор ввода >> числитель >> знаминатель
+    is>>obj.numerator>>obj.denominator;
+    return is;
+}  
+
 Fraction operator+(const Fraction& lha, const Fraction& rha){
     int den = lha.denominator * rha.denominator;
     int num = rha.numerator * lha.denominator + rha.numerator * lha.denominator;
