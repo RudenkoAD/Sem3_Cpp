@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 struct Point
 {
@@ -33,11 +34,13 @@ class Rectangle{
     public:
     Rectangle(): TopRight(0, 0){}
     Rectangle(Point const& target): TopRight(target){}
+    Rectangle(Rectangle const& target): TopRight(target.TopRight){}
     Rectangle(int x, int y): TopRight(x, y){}
-    Rectangle operator+ (Rectangle const& rha) const {
+
+    Rectangle operator+ (const Rectangle& rha) const {
         return Rectangle(TopRight.maxx(rha.TopRight).maxy(rha.TopRight));
     }
-    Rectangle operator* (Rectangle& rha) const {
+    Rectangle operator* (const Rectangle& rha) const {
         return Rectangle(TopRight.minx(rha.TopRight).miny(rha.TopRight));
     }
     void operator= (Rectangle rha) {
@@ -48,47 +51,41 @@ class Rectangle{
         TopRight.print();
     }
     friend std::ostream& operator<<(std::ostream& out, const Rectangle& R ) {
-        out << R.TopRight.x<<R.TopRight.y;
+        out << '('<<R.TopRight.x<<", "<<R.TopRight.y<<')';
         return out;
     }
 };
 
-Rectangle read(){
+Rectangle read(std::istream& iss = std::cin){
     std::string a, is, js;
     int i, j;
-    getline(std::cin, a, '(');
-    getline(std::cin, is, ',');
-    getline(std::cin, js, ')');
+    getline(iss, a, '(');
+    getline(iss, is, ',');
+    getline(iss, js, ')');
     i = stoi(is);
     j = stoi(js);
-    std::cout<<"i've read "<<i<<", "<<j<<'\n';
     return Rectangle(i, j);
 }
 
-Rectangle solve(Rectangle last){
-    std::string a;
-    Rectangle last, next;
-    last = read();
-    while(std::cin>>a){
-        if( a=="*"){
-            std::cout<<"i've read *\n";
-            next = read();
-            last = last*next;
-        }
-        else if( a=="+"){
-            std::cout<<"i've read +\n";
-            next = solve(last);
-            last = last+next;
-            return last;
-        }
-        else if( a == "\n"){
-            return last;
-        }
+Rectangle solve(std::istream& iss, Rectangle last=Rectangle(0, 0), bool do_read=true){
+    char a;
+    if(do_read) last = read(iss);
+    iss>>a;
+    if( a=='*'){
+        return solve(iss, last*read(iss), do_read=false);
+    }
+    else if( a=='+'){
+        return last+solve(iss, last);
+    }
+    else if( a == '\n'){
+        return last;
     }
     return last;
 }
 
 int main(){
-    Rectangle last = read();
-    std::cout<<solve(last);
+    std::string line;
+    std::getline(std::cin, line);
+    std::istringstream iss(line);
+    std::cout<<"Answer is "<<solve(iss)<<std::endl;
 }
