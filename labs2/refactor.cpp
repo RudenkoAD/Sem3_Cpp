@@ -13,10 +13,15 @@ class State{
             return states.count(s) > 0;
         }
 
+        int get_size() const{
+            return states.size();
+        }
+
         State(): states(){}
         State(std::set<int> src){
             states = src;
         }
+
         friend State operator+ (const State& lha, const State& rha);
         friend State operator- (const State& lha, const State& rha);
         friend State operator* (const State& lha, const State& rha);
@@ -95,7 +100,7 @@ public:
         return a;
     }
 
-    float operator()(State s) const {
+    float operator()(State& s) const {
         std::default_random_engine rng(seed);
         std::uniform_int_distribution<int> dstr(test_min,test_max);
         unsigned good = 0;
@@ -104,29 +109,44 @@ public:
         
         return static_cast<float>(good)/static_cast<float>(test_count);
     }
+
+    unsigned get_seed(){
+        return seed;
+    }
 };
 
-int Operator(ProbabilityTest& pt, State& st, std::ostream& out, int const n){
-    for(int i=0; i<n; i+=100){
+int Operator(ProbabilityTest& pt, State& st, std::ostream& out, int n){
+    for(int i=0; i<n; i+=1){
         pt.change_count(i);
-        out<<pt(st)<<' ';
+        out<<st.get_size()<<';'<<pt.get_seed()<<';'<<i<<';'<<pt(st)<<std::endl;
     }
-    out<<std::endl;
     return 0;
 }
 
-int N = 100000;
+
+int Operator2(ProbabilityTest& pt, State& st, std::ostream& out, int n){
+    pt.change_count(n);
+    out<<st.get_size()<<';'<<pt.get_seed()<<';'<<n<<';'<<pt(st)<<std::endl;
+    return 0;
+}
+
+int N = 1000;
 
 int main(int argc, const char * argv[]) {
-    //int seed;
+    //std::string seed;
     //std::cin>>seed;
-    std::ofstream out("out.txt");
-    out<<"TEST"<<std::endl;
+    std::string fname = "data\\rate_vs_size.csv";
+    std::ofstream out(fname);
+
+    out<<"size;seed;n_tests;success_rate\n";
+    //int size = 1000;
+    for(int size =0; size<1001; size+=25){
+        SegmentState ss = SegmentState(0, size-1); 
+        for(int seed=0; seed<=1000; seed++){
+            ProbabilityTest pt(seed,-1000,1000,N);//seed, min_number, max_number, number of tests(will be changed by operator)
+            Operator2(pt, ss, out, N);//ptest, system, ofstream, number of pellets
+        }
+    }
     out.close();
-    //SegmentState ss = SegmentState(1, 10);
-    //DiscreteState ds = DiscreteState(11);
-    //ProbabilityTest pt(seed,0,100,N);
-    //State sum = ss + ds;
-    //Operator(pt, sum, out, N);
-    //out.close(); 
+    std::cout<<"DONE";
 }
