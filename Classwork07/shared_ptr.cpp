@@ -16,11 +16,14 @@ class shared_ptr {
     shared_ptr(ControlBlock<T>* cptr): cptr(cptr){}
     template <typename U, typename... Args>
     friend shared_ptr<U> make_shared(Args&&... args);
+    void destroy(){
+      if(cptr->counter==1) delete cptr;
+      else cptr->counter--;
+    }
 
   public:
     shared_ptr(){}
     shared_ptr(T* ptr): cptr(new ControlBlock<T>(size_t(1), *ptr)){}
-  
     shared_ptr(const T& other): cptr(other.cptr) {//copy constructor
       (cptr->counter)++;
     }
@@ -29,11 +32,12 @@ class shared_ptr {
     }
 
     shared_ptr& operator=(shared_ptr& other){//copy assignment
-      delete cptr;
+      destroy();
       cptr = other.cptr;
       (cptr->counter)++;
       return *this;
     }
+
     shared_ptr& operator=(shared_ptr&& other){//move assignment
       cptr=other.cptr;
       other.cptr=nullptr;
@@ -50,8 +54,7 @@ class shared_ptr {
     }
   
     ~shared_ptr() {
-      if(cptr->counter==1) delete cptr;
-      else cptr->counter--;
+      destroy();
     }
 };
 
@@ -64,4 +67,5 @@ int main(){
   shared_ptr<int> a(make_shared<int>(2));
   shared_ptr<int> b(make_shared<int>(3));
   a=b;
+  b=a;
 }
