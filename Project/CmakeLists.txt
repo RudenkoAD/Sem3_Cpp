@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.12) 
+project (chess CXX)
+set (CMAKE_CXX_STANDARD 17)
+
+#set source files
+set (PROGRAM_SRCS main.cpp)
+
+# look for SFML and add it
+set (SFML_DIR "${CMAKE_CURRENT_LIST_DIR}/includes/SFML-2.5.1/lib/cmake/SFML/")
+set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/includes/SFML/lib/cmake/SFML")
+# set (SFML_ROOT "${CMAKE_CURRENT_LIST_DIR}/includes/SFML-2.5.1/include/SFML")
+find_package (SFML 2.5.1 REQUIRED system window graphics network audio)
+include_directories(includes/SFML-2.5.1/include)
+
+#add the project files
+add_executable (chess ${PROGRAM_SRCS})
+#target_link_libraries(chess SFML)
+target_link_libraries(chess PUBLIC sfml-graphics)
+
